@@ -16,13 +16,23 @@
 	(let [f (File. fname)]
 		(.exists f)))
 
+(defn- create-exercise [fname jdoc]
+	(spit fname jdoc))
+
 (defn lein4clojure
   "I don't do a lot."
   [project & args]
   (do 
   	(println "Hi!") 
-  	(println (fetch-exercise 1))
-  	(println (excercise-file-name 1 (fetch-exercise 1)))
-  	(println (exercise-exist? (excercise-file-name 1 (fetch-exercise 1))))))
+  	(let [jdoc (fetch-exercise 1)]
+	  	(println jdoc)
+  		(println (excercise-file-name 1 jdoc))
+  		(if (exercise-exist? (excercise-file-name 1 jdoc))
+  			(do
+  				(println "Exist"))
+  			(do
+  				(println "Doesn't exist")
+  				(create-exercise 
+  					(excercise-file-name 1 jdoc) jdoc))))))
 
 
