@@ -1,7 +1,8 @@
 (ns leiningen.lein4clojure
 	(:use 
         [clojure.data.json]
-        [clojure.string :as str]))
+        [clojure.string :as str]
+        [clostache.parser]))
 
 (import '(java.io File))
 
@@ -17,7 +18,7 @@
 		(.exists f)))
 
 (defn- create-exercise [fname jdoc]
-	(spit fname jdoc))
+	(spit fname (render-resource "resources/hello.mustache" jdoc)))
 
 (defn lein4clojure
   "I don't do a lot."
