@@ -10,8 +10,11 @@
 	(read-json (slurp (str n ".json"))))
 	; (println (slurp (str "http://4clojure.com/api/problem/" n))))
 
+(defn- excercise-ns [n jdoc]
+  (str (format "%03d" n) "_" (replace (lower-case (:title jdoc)) " " "_")))
+
 (defn- excercise-file-name [n jdoc]
-	(str (format "%03d" n) "-" (replace (lower-case (:title jdoc)) " " "-") ".clj"))
+	(str "test/leiningen/" (excercise-ns n jdoc) ".clj"))
 
 (defn- exercise-exist? [fname]
 	(let [f (File. fname)]
@@ -25,15 +28,17 @@
   [project & args]
   (do 
   	(println "Hi!") 
-  	(let [jdoc (fetch-exercise 1)]
+  	(let [
+        jdoc (fetch-exercise 1)
+        test-file-name (excercise-file-name 1 jdoc)
+        test-file-ns (excercise-ns 1 jdoc)]
 	  	(println jdoc)
-  		(println (excercise-file-name 1 jdoc))
-  		(if (exercise-exist? (excercise-file-name 1 jdoc))
+  		(if (exercise-exist? test-file-name)
   			(do
   				(println "Exist"))
   			(do
   				(println "Doesn't exist")
   				(create-exercise 
-  					(excercise-file-name 1 jdoc) jdoc))))))
+  					test-file-name (assoc jdoc :lein4clojure-ns test-file-ns)))))))
 
 
