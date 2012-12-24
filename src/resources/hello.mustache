@@ -1,16 +1,15 @@
 ;; {{title}}
 ;;
-;; {{description}}
+;; {{{description}}}
 ;;
-(ns leiningen.{{lein4clojure-ns}}
+(ns leiningen.{{l4c-ns}}
   (:use clojure.test))
 
-deftest addition
-  (is (= 4 (+ 2 2)))
-  (is (= 7 (+ 3 4))))
+(with-test
+  (defn {{l4c-test-name}} [] 
+    :code-goes-here)
+{{#l4c-tests}}  
+  (is {{.}})
+{{/l4c-tests}}
+)
 
-(deftest add-1-to-1
-  (is (= 2 (+ 1 1))))
-
-
-  
