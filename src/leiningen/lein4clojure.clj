@@ -10,11 +10,14 @@
 	(json/read-json (slurp (str n ".json"))))
 	; (println (slurp (str "http://4clojure.com/api/problem/" n))))
 
+(defn- substitute-with [s subst]
+  (str/replace (str/lower-case s) #"[ :]" subst))
+
 (defn- excercise-name [jdoc]
-  (str/replace (str/lower-case (:title jdoc)) " " "-"))
+  (substitute-with (:title jdoc) "-"))
 
 (defn- excercise-ns [n jdoc]
-  (str (format "%03d" n) "_" (str/replace (str/lower-case (:title jdoc)) " " "_")))
+  (str (format "%03d" n) "_" (substitute-with (:title jdoc) "_")))
 
 (defn- excercise-file-name [n jdoc]
 	(str "test/leiningen/" (excercise-ns n jdoc) ".clj"))
@@ -29,28 +32,31 @@
 (defn- reformat [s fname]
   (str/replace s "__" (str "(" fname ")")))
 
-(defn lein4clojure
-  "I don't do a lot."
-  [project & args]
+(defn process-exercise [n]
   (do 
-  	(println "Hi!") 
-  	(let [
-        jdoc (fetch-exercise 1)
+    (let [
+        jdoc (fetch-exercise n)
         test-name (excercise-name jdoc)
-        test-file-name (excercise-file-name 1 jdoc)
-        test-file-ns (excercise-ns 1 jdoc)
+        test-file-name (excercise-file-name n jdoc)
+        test-file-ns (excercise-ns n jdoc)
         reformat-with-name #(reformat % test-name)]
-	  	(println jdoc)
-  		(if (exercise-exist? test-file-name)
-  			(do
-  				(println "Exist"))
-  			(do
-  				(println "Doesn't exist")
+      (println jdoc)
+      (if (exercise-exist? test-file-name)
+        (do
+          (println "Exist"))
+        (do
+          (println "Doesn't exist")
           (println (assoc jdoc :lein4clojure-ns test-file-ns))
-  				(create-exercise 
-  					test-file-name (assoc jdoc 
+          (create-exercise 
+            test-file-name (assoc jdoc 
               :l4c-ns test-file-ns 
               :l4c-tests (map reformat-with-name (:tests jdoc))
               :l4c-test-name test-name)))))))
+
+(defn lein4clojure
+  "I don't do a lot."
+  [project & args]
+  (doseq [n (range 1 10)]
+    (process-exercise n)))
 
 
