@@ -27,7 +27,7 @@
 		(.exists f)))
 
 (defn- create-exercise [fname jdoc]
-	(spit fname (clostache/render-resource "resources/hello.mustache" jdoc)))
+	(spit fname (clostache/render-resource "resources/test.mustache" jdoc)))
 
 (defn- reformat [s fname]
   (str/replace s "__" (str "(" fname ")")))
@@ -56,7 +56,7 @@
 (defn lein4clojure
   "I don't do a lot."
   [project & args]
-  (doseq [n (range 1 10)]
+  (doseq [n (range 1 11)]
     (process-exercise n)))
 
 
