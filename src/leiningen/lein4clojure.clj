@@ -7,8 +7,8 @@
 (import '(java.io File))
 
 (defn- fetch-exercise [n]
-	(json/read-json (slurp (str n ".json"))))
-	; (println (slurp (str "http://4clojure.com/api/problem/" n))))
+	;(json/read-json (slurp (str n ".json"))))
+	(json/read-json (slurp (str "http://www.4clojure.com/api/problem/" n))))
 
 (defn- substitute-with [s subst]
   (str/replace (str/lower-case s) #"[ :]" subst))
@@ -19,8 +19,14 @@
 (defn- excercise-ns [n jdoc]
   (str (format "%03d" n) "_" (substitute-with (:title jdoc) "_")))
 
-(defn- excercise-file-name [n jdoc]
-	(str "test/leiningen/" (excercise-ns n jdoc) ".clj"))
+(defn- create-test-dir [test-path]
+  (let [test-dir (str test-path "/" "lein4clojure" "/")
+        f (File. test-dir)]
+    (.mkdir f)
+    test-dir))
+
+(defn- excercise-file-name [n jdoc test-dir]
+	(str test-dir (excercise-ns n jdoc) ".clj"))
 
 (defn- exercise-exist? [fname]
 	(let [f (File. fname)]
@@ -32,12 +38,13 @@
 (defn- reformat [s fname]
   (str/replace s "__" (str "(" fname ")")))
 
-(defn process-exercise [n]
+(defn process-exercise [n params]
   (do 
     (let [
         jdoc (fetch-exercise n)
+        test-dir (create-test-dir (:test-path params))
         test-name (excercise-name jdoc)
-        test-file-name (excercise-file-name n jdoc)
+        test-file-name (excercise-file-name n jdoc test-dir)
         test-file-ns (excercise-ns n jdoc)
         reformat-with-name #(reformat % test-name)]
       (println jdoc)
@@ -54,9 +61,9 @@
               :l4c-test-name test-name)))))))
 
 (defn lein4clojure
-  "I don't do a lot."
+  "Seed the current project with tests from 4clojure.com"
   [project & args]
   (doseq [n (range 1 11)]
-    (process-exercise n)))
-
-
+    (process-exercise 
+      n 
+      { :test-path (first (:test-paths project)) })))
