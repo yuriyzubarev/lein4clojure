@@ -11,4 +11,5 @@ pom.xml
 /test/lein4clojure/
 /sample-project/test/lein4clojure/
 /sample-project/target/
+lein4clojure.sublime-workspace
 
