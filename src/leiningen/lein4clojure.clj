@@ -15,27 +15,18 @@
           (pred (first s)) (cons (first s) (take-while-3 pred (rest s)))
           (< false-count 3) (cons (first s) (take-while-3 pred (rest s) (inc false-count))))))))
 
-(defn fetch-exercise [n]
+(defn fetch-problem [n]
 	;(json/read-json (slurp (str n ".json"))))
 	(json/read-json (slurp (str "http://www.4clojure.com/api/problem/" n))))
 
 (defn- substitute-with [s subst]
-  (str/replace (str/lower-case s) #"[ :]" subst))
-
-(defn- excercise-name [jdoc]
-  (substitute-with (:title jdoc) "-"))
-
-(defn- excercise-ns [n jdoc]
-  (str (format "%03d" n) "_" (substitute-with (:title jdoc) "_")))
+  (str/replace (str/lower-case s) #"[ :>,'-]" subst))
 
 (defn- create-test-dir [test-path]
   (let [test-dir (str test-path "/" "lein4clojure" "/")
         f (File. test-dir)]
     (.mkdir f)
     test-dir))
-
-(defn- excercise-file-name [n jdoc test-dir]
-	(str test-dir (excercise-ns n jdoc) ".clj"))
 
 (defn- exercise-exist? [fname]
 	(let [f (File. fname)]
@@ -50,25 +41,26 @@
 (defn process-exercise [n params]
   (try
     (let [
-        jdoc (fetch-exercise n)
+        jdoc (fetch-problem n)
         test-dir (create-test-dir (:test-path params))
-        test-name (excercise-name jdoc)
-        test-file-name (excercise-file-name n jdoc test-dir)
-        test-file-ns (excercise-ns n jdoc)
+        test-name (substitute-with (:title jdoc) "-")
+        test-file-ns (str (format "%03d" n) "_" (substitute-with test-name "_"))
+        test-full-file-name (str test-dir test-file-ns ".clj")
         reformat-with-name #(reformat % test-name)]
-      (println jdoc)
-      (if (exercise-exist? test-file-name)
+      (println "Original: " jdoc)
+      (if (exercise-exist? test-full-file-name)
         (do
           (println "Exist")
           true)
         (do
           (println "Doesn't exist")
-          (println (assoc jdoc :lein4clojure-ns test-file-ns))
-          (create-exercise 
-            test-file-name (assoc jdoc 
+          (let [jdoc-enriched (assoc jdoc 
+              :l4c-description-lines (vec (str/split (:description jdoc) #"\n"))
               :l4c-ns test-file-ns 
               :l4c-tests (map reformat-with-name (:tests jdoc))
-              :l4c-test-name test-name))
+              :l4c-test-name test-name)]
+            (println "Enriched: " jdoc-enriched)
+            (create-exercise test-full-file-name jdoc-enriched))
           true)))
     (catch Exception e false)))
 
