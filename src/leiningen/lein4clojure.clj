@@ -15,6 +15,9 @@
           (pred (first s)) (cons (first s) (take-while-3 pred (rest s)))
           (< false-count 3) (cons (first s) (take-while-3 pred (rest s) (inc false-count))))))))
 
+(defn scontains? [^String big ^String little]
+    (not (neg? (.indexOf big little))))
+
 (defn fetch-problem [n]
 	;(json/read-json (slurp (str n ".json"))))
 	(json/read-json (slurp (str "http://www.4clojure.com/api/problem/" n))))
@@ -36,7 +39,7 @@
 	(spit fname (clostache/render-resource "resources/test.mustache" jdoc)))
 
 (defn- reformat [s fname]
-  (str/replace s "__" (str "(" fname ")")))
+  (str (str/replace s "__" (str "(" fname ")")) (if (scontains? s ";") "\n")))
 
 (defn process-exercise [n params]
   (try
