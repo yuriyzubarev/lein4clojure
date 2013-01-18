@@ -14,7 +14,9 @@
   (defn {{l4c-test-name}} [] 
     :code-goes-here)
 {{#l4c-tests}}  
+{{#l4c-tests-comment}}(comment{{/l4c-tests-comment}}
   (is {{{.}}})
+{{#l4c-tests-comment}}){{/l4c-tests-comment}}
 {{/l4c-tests}}
 )
 

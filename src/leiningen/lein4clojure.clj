@@ -22,6 +22,11 @@
 	;(json/read-json (slurp (str n ".json"))))
 	(json/read-json (slurp (str "http://www.4clojure.com/api/problem/" n))))
 
+(defn fetch-exception-set []
+  (try
+    (set (map #(Integer/parseInt %) (str/split (slurp "https://gist.github.com/raw/4562392/lein4clojure.txt") #",")))
+    (catch Exception e #{})))
+
 (defn- substitute-with [s subst]
   (str/replace (str/lower-case s) #"[ :>,'-]" subst))
 
@@ -58,9 +63,10 @@
         (do
           (println "Doesn't exist")
           (let [jdoc-enriched (assoc jdoc 
-              :l4c-description-lines (vec (str/split (:description jdoc) #"\n"))
+              :l4c-description-lines (str/split (:description jdoc) #"\n")
               :l4c-ns test-file-ns 
               :l4c-tests (map reformat-with-name (:tests jdoc))
+              :l4c-tests-comment (contains? (:exception-set params) n)
               :l4c-test-name test-name)]
             (println "Enriched: " jdoc-enriched)
             (create-exercise test-full-file-name jdoc-enriched))
@@ -68,7 +74,8 @@
     (catch Exception e false)))
 
 (defn lein4clojure
-  "Seed the current project with tests from 4clojure.com"
+  "Seed the current project with tests from www.4clojure.com"
   [project & args]
-  (doall (take-while-3 true? (map #(process-exercise % { :test-path (first (:test-paths project)) }) (iterate inc 1)))))
+  (let [params { :test-path (first (:test-paths project)) :exception-set (fetch-exception-set) }]
+    (doall (take-while-3 true? (map #(process-exercise % params) (iterate inc 1))))))
 
