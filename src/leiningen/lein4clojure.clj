@@ -30,8 +30,8 @@
 (defn- substitute-with [s subst]
   (str/replace (str/lower-case s) #"[ :>,'-]" subst))
 
-(defn- create-test-dir [test-path]
-  (let [test-dir (str test-path "/" "lein4clojure" "/")
+(defn- create-test-dir [test-path difficulty]
+  (let [test-dir (str test-path "/lein4clojure/" difficulty "/")
         f (File. test-dir)]
     (.mkdir f)
     test-dir))
@@ -50,10 +50,12 @@
   (try
     (let [
         jdoc (fetch-problem n)
-        test-dir (create-test-dir (:test-path params))
+        test-difficulty (str/lower-case (:difficulty jdoc))
+        test-dir (create-test-dir (:test-path params) test-difficulty)
         test-name (substitute-with (:title jdoc) "-")
-        test-file-ns (str (format "%03d" n) "_" (substitute-with test-name "_"))
-        test-full-file-name (str test-dir test-file-ns ".clj")
+        test-class-name  (str (format "%03d" n) "_" (substitute-with test-name "_"))
+        test-file-ns (str test-difficulty "." test-class-name)
+        test-full-file-name (str test-dir test-class-name ".clj")
         reformat-with-name #(reformat % test-name)]
       (println "Original: " jdoc)
       (if (exercise-exist? test-full-file-name)
