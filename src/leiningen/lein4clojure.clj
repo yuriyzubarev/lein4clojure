@@ -31,8 +31,11 @@
     (str/replace (str/lower-case s) #"[ :>,'-]" subst))
 
 (defn- create-test-dir [test-path difficulty]
-    (let [test-dir (str test-path "/lein4clojure/" difficulty "/")
+    (let [  base-test-dir (str test-path "/lein4clojure/")
+            test-dir (str base-test-dir difficulty "/")
+            basef (File. base-test-dir)
             f (File. test-dir)]
+        (.mkdir basef)
         (.mkdir f)
         test-dir))
 
@@ -57,23 +60,26 @@
                 test-file-ns (str test-difficulty "." test-class-name)
                 test-full-file-name (str test-dir test-class-name ".clj")
                 reformat-with-name #(reformat % test-name)]
-            (println "Original: " jdoc)
+            (print "Test: " test-full-file-name "... ")
             (if (exercise-exist? test-full-file-name)
                 (do
-                    (println "Exist")
+                    (println "already exists")
                     true)
                 (do
-                    (println "Doesn't exist")
+                    (println "creating")
                     (let [jdoc-enriched (assoc jdoc 
                             :l4c-description-lines (str/split (:description jdoc) #"\n")
                             :l4c-ns test-file-ns 
                             :l4c-tests (map reformat-with-name (:tests jdoc))
                             :l4c-tests-comment (contains? (:exception-set params) n)
                             :l4c-test-name test-name)]
-                        (println "Enriched: " jdoc-enriched)
+                        ; (println "Enriched: " jdoc-enriched)
                         (create-exercise test-full-file-name jdoc-enriched))
                     true)))
-        (catch Exception e false)))
+        (catch Exception e 
+            (binding [*out* *err*]
+                (println "a little problem: " (.getMessage e)))
+            false)))
 
 (defn lein4clojure
     "Seed the current project with tests from www.4clojure.com"
