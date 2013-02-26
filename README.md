@@ -1,25 +1,35 @@
 # lein4clojure
 
-A Leiningen plugin to do many wonderful things.
+A Leiningen plugin that creates clojure unit tests for problems from www.4clojure.com
 
 ## Usage
 
-FIXME: Use this for user-level plugins:
+Use this for user-level plugins:
 
-Put `[lein4clojure "0.1.0-SNAPSHOT"]` into the `:plugins` vector of your
-`:user` profile, or if you are on Leiningen 1.x do `lein plugin install
-lein4clojure 0.1.0-SNAPSHOT`.
+Put `[com.yuriy-zubarev/lein4clojure "0.9.0-SNAPSHOT"]` into the `:plugins` vector of your
+`:user` profile.
 
-FIXME: Use this for project-level plugins:
+Use this for project-level plugins:
 
-Put `[lein4clojure "0.1.0-SNAPSHOT"]` into the `:plugins` vector of your project.clj.
+Put `[com.yuriy-zubarev/lein4clojure "0.9.0-SNAPSHOT"]` into the `:plugins` vector of your project.clj.
 
-FIXME: and add an example usage that actually makes sense:
+See `sample-project` for an example.
 
     $ lein lein4clojure
+    
+    Test:  ./my-project/test/lein4clojure/elementary/001_nothing_but_the_truth.clj ... creating
+	Test:  ./my-project/test/lein4clojure/elementary/002_simple_math.clj ... creating
+	Test:  ./my-project/test/lein4clojure/elementary/003_intro_to_strings.clj ... creating
+	Test:  ./my-project/test/lein4clojure/elementary/004_intro_to_lists.clj ... creating
+	Test:  ./my-project/test/lein4clojure/elementary/005_lists__conj.clj ... creating
+	Test:  ./my-project/test/lein4clojure/elementary/006_intro_to_vectors.clj ... creating
+	Test:  ./my-project/test/lein4clojure/elementary/007_vectors__conj.clj ... creating
+	...
+
+The project is my personal Clojure playground and it's in a pretty rough shape as I'm just embarking on the wonderful world of Clojure.
 
 ## License
 
-Copyright © 2012 FIXME
+Copyright © 2012 Yuriy Zubarev
 
 Distributed under the Eclipse Public License, the same as Clojure.
